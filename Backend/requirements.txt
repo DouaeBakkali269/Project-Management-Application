@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic[email]            # email-validator for EmailStr
+python-dotenv             # load env vars from .env
+passlib[bcrypt]           # password hashing
+python-jose[cryptography] # JWT handling
+python-multipart          # form / file parsing (for OAuth2)
+fastapi-mail              # optional, for sending invitation emails
+psycopg2-binary           # PostgreSQL driver (replace if not using Postgres)

@@ -18,7 +18,7 @@ In FastAPI, you typically use a Session object to perform CRUD operations within
 
 # get all users
 def get_all_users(db: Session):
-    return db.query(UserModel)
+    return db.query(UserModel).all()
 
 # Create User
 def create_user(db: Session, user: UserCreate):
@@ -40,11 +40,11 @@ def get_user_by_email(db: Session, email:str):
 def get_user(db: Session, user_id: UUID):
     return db.query(UserModel).filter(UserModel.id == user_id).first()
 
-# Update User 
+# Update User
 def update_user(db:Session, user_id: UUID, user_update: UserBase):
     db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
     if db_user:
-        update_data = db_user.model_dump(exclude_unset=True)
+        update_data = user_update.model_dump(exclude_unset=True)
         for key, value in update_data.items():
             setattr(db_user, key, value)
         db.commit()

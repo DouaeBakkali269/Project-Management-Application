@@ -3,11 +3,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from config import settings
 
-DATABASE_URL = "postgresql://user:password@localhost:5432/fastapidb"
-
-# create_engine is a method that creates a connection to the database. 
-engine = create_engine(DATABASE_URL)
+# create_engine is a method that creates a connection to the database.
+engine = create_engine(settings.DATABASE_URL)
 
 # sessionmaker: This is a factory function to create session objects, which are used to interact with the database (like querying, adding, or deleting rows).
 # autocommit=False: The session will not automatically commit changes to the database. You need to call session.commit() manually.

@@ -10,16 +10,16 @@ from sqlalchemy.orm import Session
 
 
 def get_task_by_id(db:Session, task_id: UUID):
-    task = db.query(ProjectModel).filter(ProjectModel.id == task_id).first()    
+    task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
     if not task:
         return None
-    return task   
+    return task
 
 def get_tasks_by_projetId(db:Session, project_id: UUID):
     db_project = db.query(ProjectModel).filter(ProjectModel.id == project_id).first()
-    if not db_project : 
+    if not db_project :
         return None
-    return db.query(TaskModel).filter(TaskModel.project_id == project_id)
+    return db.query(TaskModel).filter(TaskModel.project_id == project_id).all()
 
 def create_task(db:Session, task: TaskCreate):
     db_project = db.query(ProjectModel).filter(ProjectModel.id == task.project_id).first()
@@ -67,15 +67,15 @@ def assign_task_to_user(db: Session, task_id: UUID, user_id: UUID):
 
 
 # add comment to a task
-def add_comment_to_task(db:Session, user_id: UUID, task_id:UUID, comment:TaskCommentContent):
-    db_task = db.query(TaskModel).filter(TaskModel.id == comment.task_id).first()
-    db_user = db.query(UserModel).filter(TaskModel.id == comment.user_id).first()
+def add_comment_to_task(db:Session, task_id:UUID, user_id: UUID, comment:TaskCommentContent):
+    db_task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
+    db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
     if not db_task or not db_user:
         return None
     db_comment = TaskComment(
         user_id = user_id,
         task_id = task_id,
-        **comment.model_dump())   
+        **comment.model_dump())
     db.add(db_comment)
     db.commit()
     db.refresh(db_comment)
@@ -86,7 +86,7 @@ def get_comment_by_taskId(db:Session, task_id:UUID):
     db_task = db.query(TaskModel).filter(TaskModel.id == task_id).first()
     if not db_task:
         return None
-    return db.query(TaskComment).filter(TaskModel.task_id == task_id)   
+    return db.query(TaskComment).filter(TaskComment.task_id == task_id).all()   
 
 #Update comment
 def update_comment(db:Session, comment_id: UUID, content_update: TaskCommentContent):

@@ -33,7 +33,7 @@ class UserRead(UserBase):
     email: EmailStr
 
     class Config:
-        orm_mode = True #tells Pydantic that it can read data directly from ORM models (SQLAlchemy objects)
+        from_attributes = True  # Pydantic V2: tells Pydantic that it can read data directly from ORM models (SQLAlchemy objects)
 
 # Authentication schemas
 class Token(BaseModel):
@@ -65,8 +65,8 @@ class ProjectRead(ProjectBase):
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class config:
-        orm_mode = True
+    class Config:
+        from_attributes = True
 
 # ProjectTember schema
 class ProjectMemberCreate(BaseModel):
@@ -81,8 +81,8 @@ class ProjectMemberRead(BaseModel):
     role: str = "member"
     joined_at: datetime
 
-    class config:
-        orm_mode = True        
+    class Config:
+        from_attributes = True        
 
 # Task schemas
 class TaskBase(BaseModel):
@@ -98,15 +98,15 @@ class TaskCreate(TaskBase):
     project_id: UUID
     created_by: UUID
 
-class TaskRead(BaseModel):
+class TaskRead(TaskBase):
     id: UUID
     project_id: UUID
-    created_by: UUID    
+    created_by: UUID
     created_at: datetime
     updated_at: Optional[datetime] = None
 
-    class config:
-        orm_mode = True   
+    class Config:
+        from_attributes = True   
 
 # Task Coment schema
 class TaskCommentContent(BaseModel):

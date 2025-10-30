@@ -6,10 +6,10 @@ from uuid import UUID
 
 
 def get_all_project(db: Session):
-    return db.query(ProjectModel)
+    return db.query(ProjectModel).all()
 
 def get_project_by_id(db:Session, project_id : UUID):
-    return db.query(ProjectModel).filter(ProjectModel.id == project_id)    
+    return db.query(ProjectModel).filter(ProjectModel.id == project_id).first()    
 
 
 def create_project(db: Session, project: ProjectCreate):
@@ -76,7 +76,7 @@ def get_my_projects(db: Session, user_id: UUID):
     db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         return None
-    
+
     # Step 1: Get all project memberships for the user
     memberships = db.query(ProjectMember).filter(ProjectMember.user_id == user_id).all()
 
@@ -84,3 +84,31 @@ def get_my_projects(db: Session, user_id: UUID):
     # Step 2: Get all projects with those IDs
     projects = db.query(ProjectModel).filter(ProjectModel.id.in_(project_ids)).all()
     return projects
+
+# get available users to invite (users not already in the project)
+def get_available_users(db: Session, project_id: UUID):
+    db_project = db.query(ProjectModel).filter(ProjectModel.id == project_id).first()
+    if not db_project:
+        return None
+
+    # Get all user IDs already in the project
+    memberships = db.query(ProjectMember).filter(ProjectMember.project_id == project_id).all()
+    member_ids = [m.user_id for m in memberships]
+
+    # Get all users not in the project
+    available_users = db.query(User).filter(~User.id.in_(member_ids)).all()
+    return available_users
+
+# remove a member from a project
+def remove_project_member(db: Session, project_id: UUID, user_id: UUID):
+    membership = db.query(ProjectMember).filter(
+        ProjectMember.project_id == project_id,
+        ProjectMember.user_id == user_id
+    ).first()
+
+    if not membership:
+        return None
+
+    db.delete(membership)
+    db.commit()
+    return membership

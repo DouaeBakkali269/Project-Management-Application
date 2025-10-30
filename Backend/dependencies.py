@@ -10,7 +10,7 @@ from fastapi import Depends , HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from auth_utils import SECRET_KEY, ALGORITHM
-import crud, models
+from crud import crud_users
 from uuid import UUID
 from sqlalchemy.orm import Session
 
@@ -43,17 +43,18 @@ def get_current_user(token: str= Depends(oauth2_schema), db: Session = Depends(g
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
-    user = crud.get_user(db,UUID(user_id))
+
+    user = crud_users.get_user(db, UUID(user_id))
     if user is None:
         raise credentials_exception
     return user
 
-# role-based acces control helper
+# role-based access control helper
 def require_roles(*required_roles: str):
     def role_checker(current_user = Depends(get_current_user)):
         user_roles = current_user.roles or []
-        if not any(r in user_roles for r in required_roles):
+        # Check if user has any of the required roles
+        if not any(role in user_roles for role in required_roles):
             raise HTTPException(status_code=403, detail="Operation not permitted")
         return current_user
     return role_checker
